@@ -11,7 +11,7 @@ def report_energy(BODIES, e=0.0):
     '''
         compute the energy and return it so that it can be printed
     '''
-    for (body1,body2) in combinations(BODIES, 2):             
+    for (body1,body2) in body1_2:             
         ([x1, y1, z1], v1, m1) = BODIES[body1]
         ([x2, y2, z2], v2, m2) = BODIES[body2]
         (dx, dy, dz) = (x1-x2, y1-y2, z1-z2)
@@ -51,7 +51,7 @@ def nbody(loops, reference, iterations, BODIES, dt=0.01):
     for _ in range(loops):
         report_energy(BODIES)
         for _ in range(iterations):
-            for (body1,body2) in combinations(BODIES, 2):             
+            for (body1,body2) in body1_2:             
                 ([x1, y1, z1], v1, m1) = BODIES[body1]
                 ([x2, y2, z2], v2, m2) = BODIES[body2]
                 (dx, dy, dz) = (x1-x2, y1-y2, z1-z2)
@@ -114,5 +114,6 @@ if __name__ == '__main__':
                     5.15138902046611451e-05 * SOLAR_MASS)}
 
     val = BODIES.values()
+    body1_2 = list(combinations(BODIES, 2))
     nbody(100, 'sun', 20000, BODIES)
     print("nbody_opt.py %.3f" % (time.time()-t))
