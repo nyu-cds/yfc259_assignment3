@@ -15,16 +15,11 @@ def report_energy(BODIES, e=0.0):
     '''
         compute the energy and return it so that it can be printed
     '''
-    ##### replace nested for-loops #####
     for (body1,body2) in bodylist:             
         ([x1, y1, z1], v1, m1) = BODIES[body1]
         ([x2, y2, z2], v2, m2) = BODIES[body2]
-                
-    ##### replace compute_delta(x1, x2, y1, y2, z1, z2) #####
         (dx, dy, dz) = (x1-x2, y1-y2, z1-z2)
-                
-    ##### replace compute_energy(m1, m2, dx, dy, dz) #####
-        e -= (m1 * m2) / ((dx * dx + dy * dy + dz * dz) ** 0.5) 
+	e -= (m1 * m2) / ((dx * dx + dy * dy + dz * dz) ** 0.5) 
         
     for body in BODIES.keys():
         (r, [vx, vy, vz], m) = BODIES[body]
@@ -39,7 +34,6 @@ def nbody(loops, reference, iterations, BODIES, dt=0.01):
         iterations - number of timesteps to advance
     '''
     # Set up global state
-    ##### replace offset_momentum(BODIES[reference]) #####
     px, py, pz = 0, 0, 0
     for body in BODIES.keys():
         (r, [vx, vy, vz], m) = BODIES[body]
@@ -54,21 +48,14 @@ def nbody(loops, reference, iterations, BODIES, dt=0.01):
     
     for _ in range(loops):
         report_energy(BODIES)
-        ##### move iterations inside advance(dt, iterations) #####
-        ##### replace advance(0.01, iterations, BODIES) #####
-        ##### add interations #####
         for _ in range(iterations):
-            ##### replace nested for loops #####
             for (body1,body2) in bodylist:             
                 ([x1, y1, z1], v1, m1) = BODIES[body1]
                 ([x2, y2, z2], v2, m2) = BODIES[body2]
-                ##### replace compute_delta(x1, x2, y1, y2, z1, z2) #####
                 (dx, dy, dz) = (x1-x2, y1-y2, z1-z2)
-                ##### replace compute_mag(dt, dx, dy, dz), compute_b(m, dt, dx, dy, dz) #####
                 mag = dt * ((dx * dx + dy * dy + dz * dz) ** (-1.5))
                 b2 = m2 * mag
                 b1 = m1 * mag
-                ##### replace update_vs(v1, v2, dt, dx, dy, dz, m1, m2) #####
                 v1[0] -= dx * b2
                 v1[1] -= dy * b2
                 v1[2] -= dz * b2
@@ -77,7 +64,6 @@ def nbody(loops, reference, iterations, BODIES, dt=0.01):
                 v2[2] += dz * b1
             for body in BODIES.keys():
                 (r, [vx, vy, vz], m) = BODIES[body]
-                ##### replace update_rs(r, dt, vx, vy, vz) #####
                 r[0] += dt * vx
                 r[1] += dt * vy
                 r[2] += dt * vz
@@ -86,7 +72,6 @@ def nbody(loops, reference, iterations, BODIES, dt=0.01):
 if __name__ == '__main__':
     t = time.time()
     
-    ##### add local variables #####
     PI = 3.14159265358979323
     SOLAR_MASS = 4 * PI * PI
     DAYS_PER_YEAR = 365.24
