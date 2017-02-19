@@ -1,41 +1,35 @@
 """
     N-body simulation.
     Final optimizations.
-    Time: Average(74.060, 55.593, 68.151) = 65.93 sec
-    Improvement: 310.4767/65.93 = 4.709187x
+    Time: Average(86.440, 96.591, 79.889) = 87.64 sec
+    Improvement: 310.4767/87.64 = 3.542637x
 """
 import time
-from itertools import combinations
+
+##### add bodylist #####    
+keylist = []
+bodylist = []
+
 
 def report_energy(BODIES, e=0.0):
     '''
         compute the energy and return it so that it can be printed
     '''
-    for (body1,body2) in combinations(BODIES, 2):             
+    ##### replace nested for-loops #####
+    for (body1,body2) in bodylist:             
         ([x1, y1, z1], v1, m1) = BODIES[body1]
         ([x2, y2, z2], v2, m2) = BODIES[body2]
+                
+    ##### replace compute_delta(x1, x2, y1, y2, z1, z2) #####
         (dx, dy, dz) = (x1-x2, y1-y2, z1-z2)
-        e -= (m1 * m2) / ((dx * dx + dy * dy + dz * dz) ** 0.5)     
-    for body in val:
-        (r, [vx, vy, vz], m) = body
+                
+    ##### replace compute_energy(m1, m2, dx, dy, dz) #####
+        e -= (m1 * m2) / ((dx * dx + dy * dy + dz * dz) ** 0.5) 
+        
+    for body in BODIES.keys():
+        (r, [vx, vy, vz], m) = BODIES[body]
         e += m * (vx * vx + vy * vy + vz * vz) / 2.    
     return e
-
-def offset_momentum(ref, px=0.0, py=0.0, pz=0.0):
-    '''
-        ref is the body in the center of the system
-        offset values from this reference
-    '''
-    for body in val:
-        (r, [vx, vy, vz], m) = body
-        px -= vx * m
-        py -= vy * m
-        pz -= vz * m
-        
-    (r, v, m) = ref
-    v[0] = px / m
-    v[1] = py / m
-    v[2] = pz / m
 
 def nbody(loops, reference, iterations, BODIES, dt=0.01):
     '''
@@ -43,29 +37,47 @@ def nbody(loops, reference, iterations, BODIES, dt=0.01):
         loops - number of loops to run
         reference - body at center of system
         iterations - number of timesteps to advance
-        advance the system one timestep
     '''
-    # Set up global state   
-    offset_momentum(BODIES[reference])
+    # Set up global state
+    ##### replace offset_momentum(BODIES[reference]) #####
+    px, py, pz = 0, 0, 0
+    for body in BODIES.keys():
+        (r, [vx, vy, vz], m) = BODIES[body]
+        px -= vx * m
+        py -= vy * m
+        pz -= vz * m
+        
+    (r, v, m) = BODIES[reference]
+    v[0] = px / m
+    v[1] = py / m
+    v[2] = pz / m
     
     for _ in range(loops):
         report_energy(BODIES)
+        ##### move iterations inside advance(dt, iterations) #####
+        ##### replace advance(0.01, iterations, BODIES) #####
+        ##### add interations #####
         for _ in range(iterations):
-            for (body1,body2) in combinations(BODIES, 2):             
+            ##### replace nested for loops #####
+            for (body1,body2) in bodylist:             
                 ([x1, y1, z1], v1, m1) = BODIES[body1]
                 ([x2, y2, z2], v2, m2) = BODIES[body2]
+                ##### replace compute_delta(x1, x2, y1, y2, z1, z2) #####
                 (dx, dy, dz) = (x1-x2, y1-y2, z1-z2)
+                ##### replace compute_mag(dt, dx, dy, dz), compute_b(m, dt, dx, dy, dz) #####
                 mag = dt * ((dx * dx + dy * dy + dz * dz) ** (-1.5))
                 b2 = m2 * mag
                 b1 = m1 * mag
+                ##### replace update_vs(v1, v2, dt, dx, dy, dz, m1, m2) #####
                 v1[0] -= dx * b2
                 v1[1] -= dy * b2
                 v1[2] -= dz * b2
                 v2[0] += dx * b1
                 v2[1] += dy * b1
                 v2[2] += dz * b1
-            for body in val:
-                (r, [vx, vy, vz], m) = body
+            for body in BODIES.keys():
+                (r, [vx, vy, vz], m) = BODIES[body]
+                ##### replace update_rs(r, dt, vx, vy, vz) #####
                 r[0] += dt * vx
                 r[1] += dt * vy
                 r[2] += dt * vz
@@ -73,7 +85,8 @@ def nbody(loops, reference, iterations, BODIES, dt=0.01):
 
 if __name__ == '__main__':
     t = time.time()
-
+    
+    ##### add local variables #####
     PI = 3.14159265358979323
     SOLAR_MASS = 4 * PI * PI
     DAYS_PER_YEAR = 365.24
@@ -112,7 +125,10 @@ if __name__ == '__main__':
                      1.62824170038242295e-03 * DAYS_PER_YEAR,
                      -9.51592254519715870e-05 * DAYS_PER_YEAR],
                     5.15138902046611451e-05 * SOLAR_MASS)}
-
-    val = BODIES.values()
+    for key in BODIES:
+        keylist.append(key)
+    for i in range(5):
+        for j in range(i+1,5):
+            bodylist.append((keylist[i], keylist[j]))
     nbody(100, 'sun', 20000, BODIES)
     print("nbody_opt.py %.3f" % (time.time()-t))
